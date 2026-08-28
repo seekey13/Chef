@@ -261,8 +261,11 @@ ashita.events.register('d3d_present', 'present_cb', function ()
             imgui.OpenPopup('##ChefFoodMenu');
         end
 
+        -- The image window runs with zero padding; popups inherit it, so give
+        -- the menus their own breathing room..
+        imgui.PushStyleVar(ImGuiStyleVar_WindowPadding, { 8, 8, });
         if (imgui.BeginPopup('##ChefFoodMenu')) then
-            imgui.Text('Food');
+            imgui.Text('Eat Food');
             imgui.Separator();
             if (#chef.food == 0) then
                 imgui.TextDisabled('Nothing usable in inventory.');
@@ -305,6 +308,7 @@ ashita.events.register('d3d_present', 'present_cb', function ()
             end
             imgui.EndPopup();
         end
+        imgui.PopStyleVar();
 
         local x, y = imgui.GetWindowPos();
         if (x ~= chef.settings.pos_x or y ~= chef.settings.pos_y) then

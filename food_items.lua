@@ -3,7 +3,6 @@
 -- category=="Usable" AND description contains a food-effect signature.
 --   food     = grants a standard food buff
 --   crafting = rusks & macarons (synthesis buffs)
---   petfood  = BST Pet Food (used via Reward)
 -- Usage: local food = require('food_items'); local e = food[itemId];
 
 return {
