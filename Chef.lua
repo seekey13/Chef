@@ -10,6 +10,7 @@ local ffi       = require('ffi');
 local d3d       = require('d3d8');
 local imgui     = require('imgui');
 local settings  = require('settings');
+local food_db   = require('food_items');
 
 local C         = ffi.C;
 local d3d8dev   = d3d.get_device();
@@ -108,12 +109,10 @@ end
 --[[
 * Rebuilds the food list from the player's inventory.
 *
-* ponytail: there is no food flag, so this is type 7 (usable item) narrowed by
-* the flag word food happens to share. Rare/Ex food carries 0x8000/0x4000 on
-* top and so will not match; mask those off here if any turns up missing.
+* Membership comes from food_items.lua, a generated id lookup (see its header).
+* Only the "food" class is offered here; the file also carries "crafting"
+* (rusks/macarons) and "petfood", which are eaten by other means.
 --]]
-local ITEM_TYPE_USABLE = 7;
-local ITEM_FLAGS_FOOD  = 1548; -- 0x060C
 
 -- Descriptions embed 0xEF + a code byte for elements and a few symbols..
 local AUTO_TRANSLATE = T{
@@ -146,9 +145,10 @@ local function scan_food()
     local descs  = T{};
     for slot = 1, max do
         local item = inv:GetContainerItem(0, slot);
-        if (item ~= nil and item.Id ~= 0 and item.Id ~= 65535) then
+        local entry = item ~= nil and food_db.meta[item.Id] or nil;
+        if (entry ~= nil and entry.class == 'food') then
             local data = res:GetItemById(item.Id);
-            if (data ~= nil and data.Type == ITEM_TYPE_USABLE and data.Flags == ITEM_FLAGS_FOOD) then
+            if (data ~= nil) then
                 local name = data.Name[1];
                 counts[name] = (counts[name] or 0) + item.Count;
                 descs[name] = descs[name] or clean_description(data.Description and data.Description[1]);
