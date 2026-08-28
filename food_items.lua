@@ -1,11 +1,15 @@
 -- FFXI food item lookup for Ashita v4, keyed by item id.
--- Generated from Windower Resources (items.lua + item_descriptions.lua):
--- category=="Usable" AND description contains a food-effect signature.
---   food     = grants a standard food buff
---   crafting = rusks & macarons (synthesis buffs)
+-- Generated from Windower Resources (items.lua + item_descriptions.lua) and
+-- classified against the server item scripts in scripts/items/*.lua:
+--   food         = grants a standard food buff
+--   drink        = applies Regen or Refresh instead of a food buff
+--   combat_skill = "Increases rate of combat/magic skill gains"
+--   craft_skill  = synthesis success / skill gain / material loss / HQ rate
+-- Pet food is excluded; players cannot eat it.
 -- Usage: local food = require('food_items'); local e = food[itemId];
 
 return {
+    -- Food (571) -- grants a standard food buff
     [4235] = { name = "Cursed Soup", class = "food" },
     [4266] = { name = "Fulm-long Sub", class = "food" },
     [4267] = { name = "Btr. Nebimonite", class = "food" },
@@ -31,10 +35,6 @@ return {
     [4296] = { name = "Green Curry", class = "food" },
     [4297] = { name = "Black Curry", class = "food" },
     [4298] = { name = "Red Curry", class = "food" },
-    [4299] = { name = "Orange au Lait", class = "food" },
-    [4300] = { name = "Apple au Lait", class = "food" },
-    [4301] = { name = "Pear au Lait", class = "food" },
-    [4303] = { name = "Persikos au Lait", class = "food" },
     [4320] = { name = "Apple Pie +1", class = "food" },
     [4321] = { name = "T. Timbers Salad", class = "food" },
     [4322] = { name = "Dhalmel Pie +1", class = "food" },
@@ -71,7 +71,6 @@ return {
     [4364] = { name = "Black Bread", class = "food" },
     [4371] = { name = "Grilled Hare", class = "food" },
     [4376] = { name = "Meat Jerky", class = "food" },
-    [4378] = { name = "Selbina Milk", class = "food" },
     [4380] = { name = "Smoked Salmon", class = "food" },
     [4381] = { name = "Meat Mithkabob", class = "food" },
     [4391] = { name = "Bretzel", class = "food" },
@@ -98,8 +97,6 @@ return {
     [4419] = { name = "Mushroom Soup", class = "food" },
     [4420] = { name = "Tomato Soup", class = "food" },
     [4421] = { name = "Melon Pie", class = "food" },
-    [4422] = { name = "Orange Juice", class = "food" },
-    [4424] = { name = "Melon Juice", class = "food" },
     [4430] = { name = "Pumpkin Soup", class = "food" },
     [4433] = { name = "Dhalmel Stew", class = "food" },
     [4434] = { name = "Mushroom Risotto", class = "food" },
@@ -166,7 +163,6 @@ return {
     [4555] = { name = "Windurst Salad", class = "food" },
     [4556] = { name = "Icecap Rolanberry", class = "food" },
     [4557] = { name = "Steamed Catfish", class = "food" },
-    [4558] = { name = "Yagudo Drink", class = "food" },
     [4559] = { name = "Herb Quus", class = "food" },
     [4560] = { name = "Vegetable Soup", class = "food" },
     [4561] = { name = "Seafood Stew", class = "food" },
@@ -404,7 +400,6 @@ return {
     [5700] = { name = "Anch. Pizza +1", class = "food" },
     [5701] = { name = "Nopales Salad", class = "food" },
     [5702] = { name = "Nopales Salad +1", class = "food" },
-    [5703] = { name = "Uleguerand Milk", class = "food" },
     [5704] = { name = "Angler's Cassoulet", class = "food" },
     [5705] = { name = "Hmd. Salis. Steak", class = "food" },
     [5706] = { name = "Hmd. Carbonara", class = "food" },
@@ -459,24 +454,10 @@ return {
     [5776] = { name = "Crepe Caprice", class = "food" },
     [5777] = { name = "Pear Crepe", class = "food" },
     [5778] = { name = "Crepe B. Helene", class = "food" },
-    [5779] = { name = "Cherry Macaron", class = "crafting" },
-    [5780] = { name = "Coffee Macaron", class = "crafting" },
-    [5781] = { name = "Kitron Macaron", class = "crafting" },
-    [5782] = { name = "Sugar Rusk", class = "crafting" },
-    [5783] = { name = "Chocolate Rusk", class = "crafting" },
-    [5784] = { name = "Coconut Rusk", class = "crafting" },
     [5859] = { name = "Glk. Sausage +1", class = "food" },
     [5860] = { name = "Glk. Sausage +2", class = "food" },
     [5861] = { name = "Glk. Sausage +3", class = "food" },
     [5862] = { name = "Glk. Sausage -1", class = "food" },
-    [5885] = { name = "Saltena", class = "food" },
-    [5886] = { name = "Elshena", class = "food" },
-    [5887] = { name = "Montagna", class = "food" },
-    [5888] = { name = "Maringna", class = "food" },
-    [5889] = { name = "Stuffed Pitaru", class = "food" },
-    [5890] = { name = "Poultry Pitaru", class = "food" },
-    [5891] = { name = "Seafood Pitaru", class = "food" },
-    [5892] = { name = "B.E.W. Pitaru", class = "food" },
     [5893] = { name = "Marine Stewpot", class = "food" },
     [5894] = { name = "Prm. Mn. Stewpot", class = "food" },
     [5922] = { name = "Walnut Cookie", class = "food" },
@@ -489,8 +470,6 @@ return {
     [5929] = { name = "Ojo Rice Ball", class = "food" },
     [5930] = { name = "Sprightly Soup", class = "food" },
     [5931] = { name = "Shimmy Soup", class = "food" },
-    [5932] = { name = "Kitron Juice", class = "food" },
-    [5933] = { name = "D. Fruit au Lait", class = "food" },
     [5934] = { name = "Chocobiscuit", class = "food" },
     [5935] = { name = "Moogurt", class = "food" },
     [5940] = { name = "Trail Cookie", class = "food" },
@@ -519,8 +498,6 @@ return {
     [6010] = { name = "Sakura Biscuit", class = "food" },
     [6063] = { name = "Fruit Parfait", class = "food" },
     [6064] = { name = "Queen's Crown", class = "food" },
-    [6065] = { name = "Tiny Macaron", class = "crafting" },
-    [6066] = { name = "Tiny Rusk", class = "crafting" },
     [6069] = { name = "Riverfin Soup", class = "food" },
     [6070] = { name = "Oceanfin Soup", class = "food" },
     [6071] = { name = "Magma Steak", class = "food" },
@@ -540,7 +517,6 @@ return {
     [6224] = { name = "A. Snow Cone", class = "food" },
     [6225] = { name = "C. Coalescence", class = "food" },
     [6226] = { name = "Pixioche", class = "food" },
-    [6257] = { name = "Jungle Nectar", class = "food" },
     [6258] = { name = "Shiromochi", class = "food" },
     [6259] = { name = "Shiromochi +1", class = "food" },
     [6260] = { name = "Akamochi", class = "food" },
@@ -605,12 +581,38 @@ return {
     [6612] = { name = "Sea. Gratin +1", class = "food" },
     [6686] = { name = "Gyudon", class = "food" },
     [6687] = { name = "Gyudon +1", class = "food" },
-    [17016] = { name = "Pet Food Alpha", class = "petfood" },
-    [17017] = { name = "Pet Food Beta", class = "petfood" },
-    [17018] = { name = "Pet Fd. Gamma", class = "petfood" },
-    [17019] = { name = "Pet Food Delta", class = "petfood" },
-    [17020] = { name = "Pet Fd. Epsilon", class = "petfood" },
-    [17021] = { name = "Pet Food Zeta", class = "petfood" },
-    [17022] = { name = "Pet Food Eta", class = "petfood" },
-    [17023] = { name = "Pet Food Theta", class = "petfood" },
-}
+
+    -- Drink (12) -- applies Regen or Refresh, no food buff
+    [4299] = { name = "Orange au Lait", class = "drink" },
+    [4300] = { name = "Apple au Lait", class = "drink" },
+    [4301] = { name = "Pear au Lait", class = "drink" },
+    [4303] = { name = "Persikos au Lait", class = "drink" },
+    [4378] = { name = "Selbina Milk", class = "drink" },
+    [4422] = { name = "Orange Juice", class = "drink" },
+    [4424] = { name = "Melon Juice", class = "drink" },
+    [4558] = { name = "Yagudo Drink", class = "drink" },
+    [5703] = { name = "Uleguerand Milk", class = "drink" },
+    [5932] = { name = "Kitron Juice", class = "drink" },
+    [5933] = { name = "D. Fruit au Lait", class = "drink" },
+    [6257] = { name = "Jungle Nectar", class = "drink" },
+
+    -- Combat Skill (8) -- increases combat or magic skill gain rate
+    [5885] = { name = "Saltena", class = "combat_skill" },
+    [5886] = { name = "Elshena", class = "combat_skill" },
+    [5887] = { name = "Montagna", class = "combat_skill" },
+    [5888] = { name = "Maringna", class = "combat_skill" },
+    [5889] = { name = "Stuffed Pitaru", class = "combat_skill" },
+    [5890] = { name = "Poultry Pitaru", class = "combat_skill" },
+    [5891] = { name = "Seafood Pitaru", class = "combat_skill" },
+    [5892] = { name = "B.E.W. Pitaru", class = "combat_skill" },
+
+    -- Crafting Skill (8) -- synthesis success, skill gain, loss or HQ rate
+    [5779] = { name = "Cherry Macaron", class = "craft_skill" },
+    [5780] = { name = "Coffee Macaron", class = "craft_skill" },
+    [5781] = { name = "Kitron Macaron", class = "craft_skill" },
+    [5782] = { name = "Sugar Rusk", class = "craft_skill" },
+    [5783] = { name = "Chocolate Rusk", class = "craft_skill" },
+    [5784] = { name = "Coconut Rusk", class = "craft_skill" },
+    [6065] = { name = "Tiny Macaron", class = "craft_skill" },
+    [6066] = { name = "Tiny Rusk", class = "craft_skill" },
+};

@@ -110,9 +110,14 @@ end
 * Rebuilds the food list from the player's inventory.
 *
 * Membership comes from food_items.lua, a generated id lookup (see its header).
-* Only the "food" class is offered here; the file also carries "crafting"
-* (rusks/macarons) and "petfood", which are eaten by other means.
+* Entries are bucketed by class so the menu can show them under headings.
 --]]
+local MENU_SECTIONS = T{
+    T{ class = 'food',         label = 'Food', },
+    T{ class = 'drink',        label = 'Drink', },
+    T{ class = 'combat_skill', label = 'Combat Skill', },
+    T{ class = 'craft_skill',  label = 'Crafting Skill', },
+};
 
 -- Descriptions embed 0xEF + a code byte for elements and a few symbols..
 local AUTO_TRANSLATE = T{
@@ -135,6 +140,9 @@ end
 
 local function scan_food()
     chef.food = T{};
+    for _, section in ipairs(MENU_SECTIONS) do
+        chef.food[section.class] = T{};
+    end
 
     local inv = AshitaCore:GetMemoryManager():GetInventory();
     local res = AshitaCore:GetResourceManager();
@@ -146,20 +154,23 @@ local function scan_food()
     for slot = 1, max do
         local item = inv:GetContainerItem(0, slot);
         local entry = item ~= nil and food_db[item.Id] or nil;
-        if (entry ~= nil and entry.class == 'food') then
+        if (entry ~= nil and chef.food[entry.class] ~= nil) then
             local data = res:GetItemById(item.Id);
             if (data ~= nil) then
                 local name = data.Name[1];
                 counts[name] = (counts[name] or 0) + item.Count;
-                descs[name] = descs[name] or clean_description(data.Description and data.Description[1]);
+                descs[name] = descs[name] or T{ entry.class, clean_description(data.Description and data.Description[1]), };
             end
         end
     end
 
     for name, count in pairs(counts) do
-        table.insert(chef.food, T{ name = name, count = count, desc = descs[name], });
+        local class, desc = descs[name][1], descs[name][2];
+        table.insert(chef.food[class], T{ name = name, count = count, desc = desc, });
     end
-    table.sort(chef.food, function (a, b) return a.name < b.name; end);
+    for _, list in pairs(chef.food) do
+        table.sort(list, function (a, b) return a.name < b.name; end);
+    end
 end
 
 local function has_food_buff()
@@ -266,25 +277,33 @@ ashita.events.register('d3d_present', 'present_cb', function ()
         imgui.PushStyleVar(ImGuiStyleVar_WindowPadding, { 8, 8, });
         if (imgui.BeginPopup('##ChefFoodMenu')) then
             imgui.Text('Eat Food');
-            imgui.Separator();
-            if (#chef.food == 0) then
-                imgui.TextDisabled('Nothing usable in inventory.');
-            else
-                for _, entry in ipairs(chef.food) do
-                    if (imgui.Selectable(('%s (%d)'):fmt(entry.name, entry.count))) then
-                        AshitaCore:GetChatManager():QueueCommand(1, ('/item "%s" <me>'):fmt(entry.name));
-                        imgui.CloseCurrentPopup();
-                    end
-                    if (entry.desc ~= '' and imgui.IsItemHovered()) then
-                        imgui.BeginTooltip();
-                        imgui.PushTextWrapPos(300);
-                        imgui.TextUnformatted(entry.desc);
-                        imgui.PopTextWrapPos();
-                        imgui.EndTooltip();
+            local shown = 0;
+            for _, section in ipairs(MENU_SECTIONS) do
+                local list = chef.food[section.class] or T{};
+                if (#list > 0) then
+                    shown = shown + 1;
+                    imgui.Separator();
+                    imgui.TextDisabled(section.label);
+                    for _, entry in ipairs(list) do
+                        if (imgui.Selectable(('%s (%d)'):fmt(entry.name, entry.count))) then
+                            AshitaCore:GetChatManager():QueueCommand(1, ('/item "%s" <me>'):fmt(entry.name));
+                            imgui.CloseCurrentPopup();
+                        end
+                        if (entry.desc ~= '' and imgui.IsItemHovered()) then
+                            imgui.BeginTooltip();
+                            imgui.PushTextWrapPos(300);
+                            imgui.TextUnformatted(entry.desc);
+                            imgui.PopTextWrapPos();
+                            imgui.EndTooltip();
+                        end
                     end
                 end
             end
             imgui.Separator();
+            if (shown == 0) then
+                imgui.TextDisabled('Nothing usable in inventory.');
+                imgui.Separator();
+            end
             if (imgui.Selectable('Open Store')) then
                 AshitaCore:GetChatManager():QueueCommand(1, '!chef');
                 imgui.CloseCurrentPopup();
