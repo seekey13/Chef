@@ -145,7 +145,7 @@ local function scan_food()
     local descs  = T{};
     for slot = 1, max do
         local item = inv:GetContainerItem(0, slot);
-        local entry = item ~= nil and food_db.meta[item.Id] or nil;
+        local entry = item ~= nil and food_db[item.Id] or nil;
         if (entry ~= nil and entry.class == 'food') then
             local data = res:GetItemById(item.Id);
             if (data ~= nil) then
