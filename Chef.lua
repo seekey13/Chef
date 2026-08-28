@@ -115,6 +115,25 @@ end
 local ITEM_TYPE_USABLE = 7;
 local ITEM_FLAGS_FOOD  = 1548; -- 0x060C
 
+-- Descriptions embed 0xEF + a code byte for elements and a few symbols..
+local AUTO_TRANSLATE = T{
+    [0x1F] = 'Fire', [0x20] = 'Ice',   [0x21] = 'Wind',  [0x22] = 'Earth',
+    [0x23] = 'Lightning', [0x24] = 'Water', [0x25] = 'Light', [0x26] = 'Dark',
+    [0x60] = '~',
+};
+
+--[[
+* Makes an item description safe to hand to imgui: normalises line endings and
+* swaps the 0xEF control pairs for text. Unknown codes are dropped rather than
+* drawn as mojibake.
+--]]
+local function clean_description(desc)
+    if (desc == nil) then return ''; end
+    return (desc:gsub('\r\n?', '\n'):gsub('\239(.)', function (b)
+        return AUTO_TRANSLATE[b:byte()] or '';
+    end));
+end
+
 local function scan_food()
     chef.food = T{};
 
@@ -124,6 +143,7 @@ local function scan_food()
     if (max == nil or max <= 0) then return; end
 
     local counts = T{};
+    local descs  = T{};
     for slot = 1, max do
         local item = inv:GetContainerItem(0, slot);
         if (item ~= nil and item.Id ~= 0 and item.Id ~= 65535) then
@@ -131,12 +151,13 @@ local function scan_food()
             if (data ~= nil and data.Type == ITEM_TYPE_USABLE and data.Flags == ITEM_FLAGS_FOOD) then
                 local name = data.Name[1];
                 counts[name] = (counts[name] or 0) + item.Count;
+                descs[name] = descs[name] or clean_description(data.Description and data.Description[1]);
             end
         end
     end
 
     for name, count in pairs(counts) do
-        table.insert(chef.food, T{ name = name, count = count, });
+        table.insert(chef.food, T{ name = name, count = count, desc = descs[name], });
     end
     table.sort(chef.food, function (a, b) return a.name < b.name; end);
 end
@@ -250,6 +271,13 @@ ashita.events.register('d3d_present', 'present_cb', function ()
                     if (imgui.Selectable(('%s (%d)'):fmt(entry.name, entry.count))) then
                         AshitaCore:GetChatManager():QueueCommand(1, ('/item "%s" <me>'):fmt(entry.name));
                         imgui.CloseCurrentPopup();
+                    end
+                    if (entry.desc ~= '' and imgui.IsItemHovered()) then
+                        imgui.BeginTooltip();
+                        imgui.PushTextWrapPos(300);
+                        imgui.TextUnformatted(entry.desc);
+                        imgui.PopTextWrapPos();
+                        imgui.EndTooltip();
                     end
                 end
             end
